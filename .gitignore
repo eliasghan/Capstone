@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Scratch
+_to_delete/
+
+# git lock-file workaround (mounted folder cannot unlink)
+.gitjunk/
