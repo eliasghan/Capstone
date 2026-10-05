@@ -2,9 +2,108 @@
 
 A running record of each week's recommended points, realised outputs, findings, and any changes made to the per-function strategy. Newest week is added at the top of the log. Setup: 8 black-box functions, all **maximise** over [0, 1]^d, with a budget of 13 sequential trials per function (~1 week per evaluation). Optimiser configs live in each `function_i/F{i}_optimizer.ipynb`; shared code in `bbo_toolkit.py`.
 
-**Current best-so-far (updated each week):** F1 1.04e-4 · F2 0.6291 · F3 −0.02524 · F4 0.5895 · **F5 4643.17** · **F6 −0.2497** · F7 2.5758 · **F8 9.9731**
-**Trials used: 10 of 13 · remaining: 3** *(F4: 9 used, 4 remaining — round-3 trial was misrouted, see Week 3)*
-**Round 11 submitted 2026-10-01; outputs pending. Two rounds remain after it.**
+**Current best-so-far (updated each week):** F1 1.04e-4 · F2 0.6291 · F3 −0.02524 · **F4 0.5958** · **F5 4998.33** · F6 −0.2497 · **F7 2.5917** · F8 9.9731
+**Trials used: 11 of 13 · remaining: 2** *(F4: 10 used, 3 remaining — round-3 trial was misrouted, see Week 3)*
+**Round 12 submitted 2026-10-05; outputs pending. One round remains after it.**
+
+---
+
+## Week 12 — Round-11 results (logged 2026-10-05)
+
+**Summary.** Three new bests — **F5 4998.33**, **F4 0.5958135**, **F7 2.5916590** — and the
+round's real news is that F5's ridge is still accelerating and F2 turned out to be far noisier
+than we had priced in. Routing checked first: all eight submitted inputs match the recommended
+points exactly.
+
+**Results this round.**
+
+| Fn | Realised | Prev best | New best? |
+|----|----------|-----------|-----------|
+| 1 | 1.0200e-4 | 1.0395e-4 | no — but it pinned the lobe maximum between two readings |
+| 2 | 0.540073 | 0.6291 | no — and it settled the noise question the other way |
+| 3 | −0.026440 | −0.025235 | no — brackets x2 tightly from above |
+| 4 | **0.5958135** | 0.5895267 | **yes** |
+| 5 | **4998.33** | 4643.17 | **yes — second vindicated override in a row** |
+| 6 | −0.275699 | −0.249746 | no — and it refuted the model's preferred direction |
+| 7 | **2.5916590** | 2.575776 | **yes** |
+| 8 | 9.9718498 | 9.9730753 | no — fourth reading in a row inside 0.016 |
+
+**Four findings.**
+
+- **F5's ridge has not turned, and the rise is super-exponential.** Five readings now sit on
+  the corner with the other three inputs pinned at the boundary: 4451.7, 4478.9, 4554.8,
+  4643.2, 4998.3. The log-slope across those steps runs 0.070, 0.164, 0.292, 0.526 — it
+  **doubles every 0.097 of travel in that input**. Fitting that growth and integrating it puts
+  the far corner near 30000, roughly six times the incumbent. The surrogate disagrees violently
+  (it predicts 770 there) but it cannot do otherwise: it is a quadratic on a log scale, so past
+  its own vertex it is structurally obliged to predict a fall. Its prediction at the corner is a
+  property of the model family, not evidence about the function.
+
+- **F2 is noisier than we had priced in — and that is good news.** Seven readings now sit inside
+  a window 0.009 wide and span 0.089, with a standard deviation of 0.036. That is half again the
+  0.024 we had been assuming. Against a best-observed score, a bigger noise band makes repeated
+  drawing *better*, not worse: a fresh draw at the peak has about a one-in-five chance of
+  clearing the incumbent, and one-in-three across the two remaining rounds. Nothing else
+  available on this function comes close to those odds.
+
+- **F6's model has the sign of its gradient wrong, exactly as F5's did.** Holding everything else
+  fixed, the second input gives −0.27570 at 0.413026 against −0.24975 at 0.453026 — improving as
+  it rises, at 0.65 per unit. The additive surrogate, scoring 0.899, wants to move it *down*.
+  An older configuration says the same thing over a much wider span (−0.64991 at 0.143514
+  against −0.49840 at 0.453026), so two independent slices agree and the model is alone. Nothing
+  above 0.453026 has ever been measured on that axis.
+
+- **F4's step floor was still coarser than its own structure.** Three readings differing only in
+  the second input give 0.58953, 0.59581, 0.58916 at 0.411177, 0.421177 and 0.422760 — a bracket
+  **0.0015 wide**, against a step floor of 0.005. The proposer therefore had to overshoot, and it
+  did: it asked for +0.01 and valued it at 0.6986, in a direction where a reading 0.0016 away has
+  already fallen. This is the week-8 lesson recurring one order of magnitude further down.
+
+**Changes applied for round 12.**
+
+- **F5** — probe to the **full corner**, all four inputs at the boundary. Five monotone readings
+  with an accelerating log-slope, and the other three inputs already pinned there, both say the
+  optimum is a corner. If it comes back low, the peak is bracketed in (0.62, 1.0) and the final
+  trial bisects; if it comes back high, this is the project's largest single gain.
+- **F4** — `MIN_STEP` cut tenfold to 0.0005 so the proposer can step inside its own bracket, plus
+  a probe at the parabola vertex of the three-point slice (0.416930), worth about +0.0075.
+- **F6** — probe moving the second input **up** 0.04 and the fourth **down** 0.04, each along its
+  own measured gradient and each the same size as the step that measured it. Moving two axes at
+  once costs interpretability — a fall will not say which one caused it — and that is the price
+  of having two rounds rather than five.
+- **F2** — probe taking a clean replicate draw, generated by moving the **inert** second input by
+  0.10 rather than by jittering the first. A 0.35 move on that axis changed the output by 0.003,
+  so to the function this is the same location, while to the record it is a distinct point. The
+  model's own proposal pushed that inert axis to the boundary and predicted below the incumbent.
+- **F3** — probe setting both free inputs to the vertices of the parabolas through their own
+  bracketing readings (0.586388 and 0.860752). Both are interpolations inside measured brackets,
+  which is the limit of what a model scoring 0.11 should be trusted with; the proposer moves one
+  axis per round and cannot take both.
+- **F1** — probe at the lobe vertex, 0.582509, read off the three readings now sitting on the
+  peak. Worth about 1.6 per cent. Its own bracket cannot reach it, because the bracket's next
+  step is already in the data.
+- **F7** — trust region narrowed from 0.20 to **0.03**. This is the endgame plan (smallest trust
+  regions) and here it is also the line between interpolation and extrapolation: at 0.20 the
+  proposal moved the sixth input 0.094, past a reading that came back lower, and at 0.03 every
+  coordinate stays inside the span the local readings cover. The predicted gain falls only from
+  2.662 to 2.645.
+- **F8** — unchanged. Its proposal is insensitive to the trust-region radius at every value
+  tested, and it predicts the incumbent's own value. This function is converged.
+
+**Cross-validation this round.** F1 0.910 (Matérn 0.949 — ahead, but inside the 0.1 margin, so
+no change) · F2 0.667 · F3 0.113 · F4 0.980 · F5 0.859 · F6 0.899 · F7 **0.908**, its best yet ·
+F8 0.995.
+
+**One defect noticed, not fixed.** On F1 only, the "distance to it" and "below the incumbent"
+lines in the proposal block are computed against the best point in *fit* space. Because F1 is
+fitted to the magnitude of its output, that is the large negative trough reading, not the best
+true value printed two lines above. The proposal itself is unaffected. With two rounds left the
+risk of touching display code outweighs the benefit; it is recorded here instead.
+
+**What the last round should hold.** F5 is the only function where a large gain is still
+plausible, and both its outcomes leave a well-defined final move. F2 should take its second
+draw. F1, F3, F4 and F7 are refining inside brackets a few thousandths wide. F8 is finished and
+its last trial is a free lottery ticket near the incumbent.
 
 ---
 
