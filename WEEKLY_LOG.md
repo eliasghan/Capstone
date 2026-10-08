@@ -8,6 +8,66 @@ A running record of each week's recommended points, realised outputs, findings, 
 
 ---
 
+## Peer intelligence — three public posts (logged 2026-10-08)
+
+Three classmates posted their round-11 positions. Same problem set (scales match ours on every
+function). Treat the sources unequally: the second post is precise, numeric and
+self-consistent; the first is moderate; the third is clearly LLM-written and inflated in its
+prose, though its terminal table of portal values looks like genuine output.
+
+**Where we stand.**
+
+| Fn | Ours | Peer A | Peer B | Peer C | Read |
+|----|------|--------|--------|--------|------|
+| 1 | **1.04e-4** | ~0 | — | 0.000000 | **we lead** — nobody else is off the zero plateau |
+| 2 | 0.6291 | 0.697 | ~0.726 | 0.6768 | behind on paper; see below — it is noise, not position |
+| 3 | −0.02524 | −0.034 | −0.0464 | **−0.004807** | Peer C far ahead, no coordinates given |
+| 4 | 0.5958 | 0.422 | **0.7089** | 0.3675 | Peer B ahead, **and they gave the coordinate** |
+| 5 | 4998 (corner pending) | 6136.65 | corner (1,1,1,1) | **8662.48** | our round-12 point is exactly their corner |
+| 6 | −0.2497 | −0.111 | **−0.088** | −0.2084 | behind, no coordinates |
+| 7 | 2.5917 | **2.607** | ~2.58 | 2.3378 | level; our round-12 proposal predicts 2.645 |
+| 8 | **9.9731** | ~9.9 | — | 9.9567 | **we lead** |
+
+**F5 — the override was right, the extrapolation was not.** Two peers independently place the
+optimum at the upper corner, one quoting above 8600 and the other stating the corner outright.
+Our round-12 probe is that exact point, so it should land there. Our own log-slope extrapolation
+predicted near 30000 — too high by roughly three and a half times. The *direction* was read
+correctly off five monotone readings; the *magnitude* was a straight-line extension of an
+accelerating trend that in fact saturates. Worth remembering: an accelerating gradient tells you
+which way to go and almost nothing about how far.
+
+**F4 — the one actionable coordinate.** Peer B reports a new best of 0.7089 from probing the
+**fourth** input at 0.425, brackets the peak below 0.428, and puts the vertex at 0.4166. Our
+fourth input has taken only four values inside the basin, all between 0.430 and 0.441 — we have
+never looked below 0.430. On a function whose peak is a spike this narrow, being 0.016 off on
+one axis is the right order of magnitude to explain the whole 0.113 gap.
+
+**F2 — we are not actually behind.** Binning our own readings by the first input: 0.68–0.705
+averages 0.591, 0.705–0.720 averages 0.599, and 0.72–0.76 collapses to 0.331. That
+independently reproduces Peer B's ridge geometry (flat from 0.66 to 0.70, collapsing by 0.74)
+and shows our location sits on the flat part, not the shoulder. Peer B also reports three
+readings at a *single* point spanning 0.598–0.726. So the peers' 0.697 and 0.726 are luckier
+draws from the same distribution, not a better position. The correct response is unchanged:
+keep drawing.
+
+**F6 — close but off, and we know by how much.** Peer B reports that points 0.03–0.05 from
+their peak return −0.26 to −0.29, which is exactly the band our last several readings occupy.
+That calibrates our distance to the optimum without giving its direction. The fifth input has
+sat on the lower boundary in **all eleven** of our trials and has never been varied at the
+incumbent — the same blind spot that is costing us on F4.
+
+**F3 — unverifiable.** Peer C claims −0.004807 against our −0.02524 but gives no location, and
+theirs is the least trustworthy of the three posts. Our own data shows nothing promising at low
+values of the first input, and Peer A's best sits in our region and is *worse* than ours.
+
+**The pattern across F4 and F6.** In both cases the gap to a peer is best explained by an axis
+we have never varied at the incumbent, while we spent rounds refining the axes we had already
+bracketed. Local refinement concentrates effort where feedback already exists, which is also
+where the remaining gain is smallest. A single-variable sweep on every axis, early, would have
+been cheap relative to what not having it has cost.
+
+---
+
 ## Week 12 — Round-11 results (logged 2026-10-05)
 
 **Summary.** Three new bests — **F5 4998.33**, **F4 0.5958135**, **F7 2.5916590** — and the
