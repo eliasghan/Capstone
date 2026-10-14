@@ -2,9 +2,133 @@
 
 A running record of each week's recommended points, realised outputs, findings, and any changes made to the per-function strategy. Newest week is added at the top of the log. Setup: 8 black-box functions, all **maximise** over [0, 1]^d, with a budget of 13 sequential trials per function (~1 week per evaluation). Optimiser configs live in each `function_i/F{i}_optimizer.ipynb`; shared code in `bbo_toolkit.py`.
 
-**Current best-so-far (updated each week):** F1 1.04e-4 · F2 0.6291 · F3 −0.02524 · **F4 0.5958** · **F5 4998.33** · F6 −0.2497 · **F7 2.5917** · F8 9.9731
-**Trials used: 11 of 13 · remaining: 2** *(F4: 10 used, 3 remaining — round-3 trial was misrouted, see Week 3)*
-**Round 12 submitted 2026-10-05; outputs pending. One round remains after it.**
+**Current best-so-far (final, before round 13 returns):** **F1 1.05167e-4** · **F2 0.6894681** · F3 −0.0252350 · **F4 0.6027542** · **F5 8662.405** · F6 −0.2497464 · **F7 2.7486539** · **F8 9.9744580**
+**Trials used: 12 of 13 · remaining: 1 — the final submission** *(F4: 11 used; its 13th is unrecoverable, the round-3 trial was misrouted, see Week 3)*
+**Round 13 — the final round — submitted 2026-10-14. Nothing follows it.**
+
+---
+
+## Week 13 — Round-12 results and the FINAL submission (logged 2026-10-14)
+
+**Summary. Six new bests in one round: F1, F2, F4, F5, F7, F8.** The headline is **F5 at
+8662.41**, a 1.73× gain that lands within 0.08 of the figure a peer reported for the same
+corner — so that function is now solved to the boundary. **F7 jumped to 2.748654**, past every
+peer value we have seen. F3 and F6 came back marginally below their incumbents.
+
+| Fn | Realised | Prev best | New best? | Predicted | Error |
+|----|----------|-----------|-----------|-----------|-------|
+| 1 | **1.05167e-4** | 1.03949e-4 | **yes** | 1.056e-4 (parabola) | −0.4% |
+| 2 | **0.6894681** | 0.6291 | **yes** | 0.598 (model mean) | a high draw, by design |
+| 3 | −0.0254738 | −0.025235 | no | −0.02499 | −0.0005, inside the noise |
+| 4 | **0.6027542** | 0.5958135 | **yes** | 0.60334 (parabola) | −0.0006 |
+| 5 | **8662.405** | 4998.33 | **yes** | ~30000 (our extrapolation) | **−3.5×** |
+| 6 | −0.2512392 | −0.249746 | no | −0.2848 | +0.034 |
+| 7 | **2.7486539** | 2.5916590 | **yes** | 2.645 | **+0.104** |
+| 8 | **9.9744580** | 9.9730753 | **yes** | 9.9727 | +0.0018 |
+
+**What the calibration column says.** The two predictions that were nearly exact came from
+three-point parabolas through direct readings, not from any surrogate. The Gaussian processes
+were *conservative* where their cross-validation score was high — F7 under-predicted by 0.104
+and has now under-predicted twice running — and wrong about magnitude where it was not. And our
+own log-slope extrapolation on F5, the most confident call of the project, was out by a factor
+of three and a half. It got the direction right from five monotone readings and the destination
+wrong by extending an accelerating trend that in fact saturates. **An accelerating gradient tells
+you which way to go and almost nothing about how far.**
+
+**The two functions that did not improve, and why that is informative.** F3's last three moves
+have all come back inside 0.0005 of each other: that is a plateau top, and the parabola vertices
+for both free inputs now sit inside the points already measured. F6's combined move came back
+0.0015 below the incumbent, which — as flagged when it was made — does not say which of the two
+axes caused it. Both functions are out of productive local moves.
+
+---
+
+### The final round: what changes when there is no round after this one
+
+The score is the **best value observed**, so a probe that fails costs nothing — the incumbent is
+kept either way. For twelve rounds that was not the governing consideration, because a wasted
+trial meant one fewer chance to exploit later. On the last trial it is the only consideration,
+and it inverts the usual logic: **a refinement worth zero is strictly worse than a long shot
+worth nothing on average**, because the long shot has an upper tail and the refinement does not.
+
+Three functions turned out to have genuinely nothing left on the axes we have been working:
+
+- **F1's first input is exhausted to the limit of its resolution.** Four readings now sit on the
+  lobe and the parabola vertex through the best three is 0.582562, predicting a gain over the
+  incumbent of **0.00%**. There is no refinement left to buy.
+- **F4's second input is on its vertex**, with readings either side 0.0015 apart.
+- **F3 is on a plateau**, with both free inputs bracketed and flat.
+
+So those three spend the last trial on something untested, as do F6 and, in a different sense,
+F2.
+
+**F1 — the second input, never varied on the lobe.** Every reading on the positive lobe
+inherited 0.681526 from the round-4 point that found it; that axis has never moved. Fitting a
+full two-dimensional quadratic to the magnitude across all readings puts the feature's centre
+near (0.52, 0.52), which says the magnitude grows steeply as the second input *falls*. That fit
+is crude — it mispredicts our own best point by 2.4 decades — so it is a direction, not a
+destination. The first input is lowered by 0.004 alongside it, to stay on the positive side of
+the zero crossing, whose location along the one slice we have is known. Potentially orders of
+magnitude; realistically a coin flip; costs nothing if wrong.
+
+**F4 — the fourth input, never varied inside the basin.** It has taken four values in the basin,
+all between 0.430 and 0.441, and never moved at the incumbent. Two independent estimates now say
+that is the wrong place: a peer brackets the peak below 0.428 with a vertex at 0.4166, having
+measured 0.7089 there — above our best — and *our own* model's profile along that axis peaks
+near 0.420 and rates our 0.4326 below both. The submitted value, 0.4183, is the midpoint of two
+estimates that were arrived at independently.
+
+**F6 — the fifth input, pinned on the boundary for all twelve trials.** Everything else is
+bracketed: lowering the second input is worse, raising the fourth is worse, and the combined move
+was worse. The fifth has never left the lower boundary. It is set to 0.056401, which is the value
+it took in our best initial-design reading rather than a number chosen for the occasion.
+
+**F3 — the largest hole in the cube.** The plateau is worth nothing more, and a peer reports a
+value five times better than ours without saying where. The submitted point is the maximin
+choice: 0.635 from every observation we hold, against a typical nearest-neighbour spacing of
+0.152. Low odds, but it is the only move that could change this function's standing, and a
+refinement worth 0.0002 cannot.
+
+**F2 — one more draw.** Eight readings in the peak window average 0.610 with a standard
+deviation of 0.046, so a fresh draw clears the incumbent about one time in twenty-four. That is
+poor, and it is still the best available: every other location on the ridge has a lower mean.
+The draw is taken on the inert second input again.
+
+**F5 — the corner, resubmitted.** All four inputs are on the boundary and there is nowhere
+further to go. The first input is moved by nine parts in a million purely so the submission is a
+distinct point; the cost is about one unit in 8662.
+
+**F7 and F8 — the model, with the leash let out slightly on F7.** F7's cross-validated score is
+now **0.944**, its highest, and it has under-predicted its own proposal twice running. Its trust
+region goes back from 0.03 to 0.05: the proposal predicts 2.819 with a larger uncertainty band
+than the tighter box gives, and on a final draw scored by the best value observed, more mean and
+more variance both help. F8 is unchanged and proposes the same point at every radius tested,
+predicting fractionally below its own incumbent — it has been converged for three rounds.
+
+**Final submission.**
+
+| Fn | Point | Rationale |
+|----|-------|-----------|
+| 1 | 0.578600-0.671526 | untested second axis, toward the fitted feature centre |
+| 2 | 0.712637-0.726564 | one more draw against a measurement noise of 0.046 |
+| 3 | 0.442112-0.998457-0.899989 | maximin: the largest unsampled hole |
+| 4 | 0.407583-0.416930-0.360748-0.418300 | untested fourth axis; two independent estimates agree |
+| 5 | 0.999990-0.999999-0.999999-0.999999 | the corner; solved |
+| 6 | 0.422422-0.453026-0.694051-0.794604-0.056401 | untested fifth axis, off the boundary |
+| 7 | 0.000001-0.156255-0.476911-0.266948-0.324858-0.654164 | acquisition, trust region 0.05 |
+| 8 | 0.104766-0.163677-0.137498-0.000184-0.828521-0.492790-0.197999-0.605977 | acquisition, converged |
+
+**Closing position before the final results.** F1 1.05167e-4 · F2 0.6894681 · F3 −0.0252350 ·
+F4 0.6027542 · F5 8662.405 · F6 −0.2497464 · F7 2.7486539 · F8 9.9744580. Against the three peer
+posts we have seen, that is ahead on F1, F5, F7 and F8, level on F2 and F4 pending this round,
+and behind on F3 and F6.
+
+**The lesson of the last three rounds, stated plainly.** Three of the eight functions were
+leaving most of their remaining value on an axis we had never varied at the incumbent, while we
+spent round after round refining axes that were already bracketed. Local refinement concentrates
+effort where feedback already exists, and that is precisely where the remaining gain is smallest.
+A one-variable sweep across every axis, run early and cheaply, would have cost a few trials and
+found those three gaps nine rounds sooner. That is the single change I would make to the method.
 
 ---
 
