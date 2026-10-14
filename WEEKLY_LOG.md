@@ -132,6 +132,24 @@ found those three gaps nine rounds sooner. That is the single change I would mak
 
 ---
 
+**Decision on the final submission (2026-10-14).** The exploratory list was briefly reconsidered
+against a conservative one that would have sat on each function's best known point. The whole
+question turns on a single rule I had been assuming without flagging it: that the score is the
+best value observed across all thirteen trials, rather than the final submission. Under
+best-observed a failed probe is free; under final-submission the probes on F1, F3 and F6 would
+be reckless. Two things settled it. The rule is best-observed — a peer's portal screenshot
+carries a "Current Best y" column, which is the portal maintaining a running best per function.
+And the assumption only ever became decision-relevant on this last trial: buying information in
+the earlier rounds was correct under either rule, because it improved every submission that
+followed. The exploratory list stands as submitted above.
+
+The conservative alternative is recorded for completeness, since it is the right answer under the
+other rule: F1 0.582562-0.681526 · F2 unchanged · F3 0.999999-0.583000-0.859784 ·
+F4 0.407583-0.417100-0.360748-0.432592 · F5 unchanged · F6 0.423000-0.453026-0.694051-0.794604-0.000001 ·
+F7 and F8 unchanged.
+
+---
+
 ## Peer intelligence — three public posts (logged 2026-10-08)
 
 Three classmates posted their round-11 positions. Same problem set (scales match ours on every
