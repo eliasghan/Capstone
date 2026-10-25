@@ -8,3 +8,6 @@ _to_delete/
 
 # git lock-file workaround (mounted folder cannot unlink)
 .gitjunk/
+
+# session scratch
+Claude outputs/
